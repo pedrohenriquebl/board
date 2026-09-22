@@ -1,4 +1,4 @@
-import { ArchiveIcon } from "lucide-react";
+import { ArchiveIcon } from "lucide-react"
 
 export default function Home() {
   return (
@@ -26,5 +26,5 @@ export default function Home() {
         </div>
       </main>
     </div>
-  );
+  )
 }

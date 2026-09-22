@@ -1,14 +1,15 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
-import { db } from "../db";
-import { issues } from "../db/schema";
+import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi"
+import { db } from "../db"
+import { issues } from "../db/schema"
+import { validationHook } from "../lib/validation-hook"
 
-const IssueStatusSchema = z.enum(["backlog", "todo", "in_progress", "done"]);
+const IssueStatusSchema = z.enum(["backlog", "todo", "in_progress", "done"])
 
 const CreateIssueSchema = z.object({
   title: z.string().min(1),
   description: z.string().min(1),
   status: IssueStatusSchema.optional().default("backlog"),
-});
+})
 
 const IssueSchema = z.object({
   id: z.uuidv4(),
@@ -19,12 +20,12 @@ const IssueSchema = z.object({
   likes: z.number().int(),
   comments: z.number().int(),
   createdAt: z.string().datetime(),
-});
+})
 
 const ErrorSchema = z.object({
   error: z.string(),
   message: z.string(),
-});
+})
 
 const route = createRoute({
   method: "post",
@@ -56,10 +57,12 @@ const route = createRoute({
       description: "Validation failed",
     },
   },
-});
+})
 
-export const createIssue = new OpenAPIHono().openapi(route, async (c) => {
-  const body = c.req.valid("json");
+export const createIssue = new OpenAPIHono({
+  defaultHook: validationHook,
+}).openapi(route, async (c) => {
+  const body = c.req.valid("json")
 
   const [issue] = await db
     .insert(issues)
@@ -68,7 +71,7 @@ export const createIssue = new OpenAPIHono().openapi(route, async (c) => {
       description: body.description,
       status: body.status,
     })
-    .returning();
+    .returning()
 
   return c.json(
     {
@@ -82,5 +85,5 @@ export const createIssue = new OpenAPIHono().openapi(route, async (c) => {
       createdAt: issue.createdAt.toISOString(),
     },
     201,
-  );
-});
+  )
+})
