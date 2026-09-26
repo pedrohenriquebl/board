@@ -6,6 +6,8 @@ interface GetIssuesParams {
 }
 
 export async function getIssue({ id }: GetIssuesParams) {
+  "use cache";
+
   const url = new URL(`/api/issues/${id}`, clientEnv.NEXT_PUBLIC_API_URL);
 
   const response = await fetch(url);
